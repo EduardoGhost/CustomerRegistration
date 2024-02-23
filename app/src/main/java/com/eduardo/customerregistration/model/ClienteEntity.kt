@@ -1,11 +1,11 @@
 package com.eduardo.customerregistration.model
 
 import java.io.Serializable
-import java.util.*
 
 data class ClienteEntity(
 
   //  var name: String,
+    var codeId: Long? = null,
     var name: String? = null
  //   var date: Long? = null,
 

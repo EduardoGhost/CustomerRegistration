@@ -4,7 +4,7 @@ import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.eduardo.customerregistration.model.ClienteEntity
-import com.eduardo.customerregistration.model.dataBase.local.Dao
+import com.eduardo.customerregistration.model.dataBase.local.remote.Dao
 
 class CadastroViewModel : ViewModel() {
     val cadastroResult = MutableLiveData<Boolean>()

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.eduardo.customerregistration.databinding.FragmentFirstBinding
 import com.eduardo.customerregistration.view.CadastroActivity
+import com.eduardo.customerregistration.view.listClientActivity
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -29,10 +30,10 @@ class FirstFragment : Fragment() {
             val intent = Intent(activity, CadastroActivity::class.java)
             startActivity(intent)
         }
-//        binding!!.buttonSecond.setOnClickListener {
-//            val intent = Intent(activity, listClientActivity::class.java)
-//            startActivity(intent)
-//        }
+        binding!!.buttonSecond.setOnClickListener {
+            val intent = Intent(activity, listClientActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onDestroyView() {

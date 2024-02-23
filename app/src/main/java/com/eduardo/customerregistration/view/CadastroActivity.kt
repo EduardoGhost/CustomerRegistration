@@ -1,12 +1,6 @@
 package com.eduardo.customerregistration.view
 
-import android.content.Intent
-import android.database.Cursor
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.text.format.DateUtils
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -14,10 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.eduardo.customerregistration.R
 import com.eduardo.customerregistration.model.ClienteEntity
-import com.eduardo.customerregistration.model.dataBase.local.Dao
+import com.eduardo.customerregistration.model.dataBase.local.remote.Dao
 import com.eduardo.customerregistration.viewModel.CadastroViewModel
-import com.squareup.picasso.Picasso
-import java.io.File
 
 class CadastroActivity : AppCompatActivity() {
 
@@ -50,20 +42,20 @@ class CadastroActivity : AppCompatActivity() {
 
         cadastroViewModel = ViewModelProvider(this).get(CadastroViewModel::class.java)
 
-        cadastroViewModel.cadastroResult.observe(this, { resultado ->
+        cadastroViewModel.cadastroResult.observe(this) { resultado ->
             if (resultado) {
                 // Sucesso no cadastro
                 showToast("Cliente cadastrado com sucesso!")
                 clearFields()
             }
-        })
+        }
 
         // Observa mensagens de erro
-        cadastroViewModel.errorMessage.observe(this, { errorMessage ->
+        cadastroViewModel.errorMessage.observe(this) { errorMessage ->
             if (errorMessage.isNotEmpty()) {
                 showToast(errorMessage)
             }
-        })
+        }
 
 //        editTextCpfOrCnpj = findViewById(R.id.editTextCpfOrCnpj)
 //

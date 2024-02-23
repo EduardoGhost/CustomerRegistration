@@ -9,9 +9,13 @@ import java.lang.Exception
 class SQLite(context: Context?) : SQLiteOpenHelper(context, BASEDADOS, null, VERSAO_BANCO) {
     override fun onCreate(db: SQLiteDatabase) {
         val sqlCliente =
+
             "create table if not exists " + TABELA_CLIENTE + "(cliCodigo integer primary key autoincrement," +
-                    "clienteNome text not null, clienteUserName text not null, password text not null, adress text not null," +
-                    " email text not null, date Long not null, cpfOrCnpj text not null, gender text not null, picture text not null)"
+                    "clienteNome text not null)"
+
+//            "create table if not exists " + TABELA_CLIENTE + "(cliCodigo integer primary key autoincrement," +
+//                    "clienteNome text not null, clienteUserName text not null, password text not null, adress text not null," +
+//                    " email text not null, date Long not null, cpfOrCnpj text not null, gender text not null, picture text not null)"
         try {
             db.execSQL(sqlCliente)
             Log.i("Banco de dados criado", "Banco de dados: $sqlCliente")
@@ -22,7 +26,7 @@ class SQLite(context: Context?) : SQLiteOpenHelper(context, BASEDADOS, null, VER
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("create table if not exists " + TABELA_CLIENTE)
+        db.execSQL("create table if not exists $TABELA_CLIENTE")
         onCreate(db)
     }
 

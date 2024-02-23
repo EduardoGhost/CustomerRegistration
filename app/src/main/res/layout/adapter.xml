@@ -23,22 +23,22 @@
         android:textStyle="bold"
         />
 
-    <TextView
-        android:id="@+id/idTxtAlter"
-        android:layout_width="100sp"
-        android:layout_height="40sp"
-        android:layout_weight="1"
-        android:drawableEnd="@android:drawable/ic_menu_edit"
-        android:gravity="center"
-        android:drawableTint="@color/purple_500"
-        />
+<!--    <TextView-->
+<!--        android:id="@+id/idTxtAlter"-->
+<!--        android:layout_width="100sp"-->
+<!--        android:layout_height="40sp"-->
+<!--        android:layout_weight="1"-->
+<!--        android:drawableEnd="@android:drawable/ic_menu_edit"-->
+<!--        android:gravity="center"-->
+<!--        android:drawableTint="@color/purple_500"-->
+<!--        />-->
 
-    <TextView
-        android:id="@+id/idTxtDelete"
-        android:layout_width="100sp"
-        android:layout_height="40sp"
-        android:layout_weight="1"
+<!--    <TextView-->
+<!--        android:id="@+id/idTxtDelete"-->
+<!--        android:layout_width="100sp"-->
+<!--        android:layout_height="40sp"-->
+<!--        android:layout_weight="1"-->
 
-        android:gravity="center" />
+<!--        android:gravity="center" />-->
 
 </LinearLayout>
