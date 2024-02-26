@@ -8,6 +8,8 @@ import android.util.Log
 import android.widget.Toast
 import com.eduardo.customerregistration.model.ClienteEntity
 import com.eduardo.customerregistration.model.dataBase.local.Interface
+import java.lang.Exception
+import java.util.regex.Pattern
 
 class Dao(context: Context) : Interface {
     //escrever e ler os dados
@@ -23,23 +25,76 @@ class Dao(context: Context) : Interface {
     }
 
     override fun cadastroCliente(mCliente: ClienteEntity): Boolean {
-        // Verifica se o nome tem mais de 15 caracteres
-        if (mCliente.name?.length ?: 0 <= 15) {
-            showToast("Nome deve ter mais de 15 caracteres.")
-            return false
-        }
-        val values = ContentValues()
-        values.put("clienteNome", mCliente.name)
+        val senha = mCliente.password
 
-        return try {
-            sqlWrite.insert(SQLite.TABELA_CLIENTE, null, values)
-            Log.i("Cliente Dados", "${SQLite.TABELA_CLIENTE} $values")
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
+        //validador de email
+        return if (isValidEmail(mCliente.email!!)) {
+
+            //verifica se o nome tem mais de 15 caracteres
+            if (mCliente.name?.length ?: 0 <= 15) {
+                showToast("Nome deve ter mais de 15 caracteres.")
+                return false
+            }
+
+            //vertifica se userName já existe
+            if (checkIfUsernameExists(mCliente.userName!!)) {
+                showToast("Username já está em uso. Escolha outro.")
+                return false
+            }
+
+            //verifica se é maior do que 18 anos
+            val idade = mCliente.calculateAge()
+            if (idade < 18) {
+                showToast("É necessário ter mais de 18 anos para se cadastrar.")
+                return false
+            }
+            if (isPasswordValid(senha!!)) {
+                val values = ContentValues()
+                values.put("clienteNome", mCliente.name)
+                values.put("clienteUserName", mCliente.userName)
+                values.put("password", senha)
+                values.put("adress", mCliente.adress)
+                values.put("email", mCliente.email)
+                values.put("date", mCliente.date)
+                values.put("cpfOrCnpj", mCliente.cpfOrCnpj)
+                values.put("gender", mCliente.gender)
+                values.put("picture", mCliente.picture)
+                try {
+                    sqlWrite.insert(SQLite.TABELA_CLIENTE, null, values)
+                    Log.i("Cliente Dados", SQLite.TABELA_CLIENTE + values)
+                    true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    false
+                }
+            } else {
+                showToast("Senha inválida. Deve ter pelo menos 8 caracteres, um número e uma letra maiúscula.")
+                false
+            }
+        } else {
+            showToast("Email inválido. Insira um email válido.")
             false
         }
     }
+
+//    override fun cadastroCliente(mCliente: ClienteEntity): Boolean {
+//        // Verifica se o nome tem mais de 15 caracteres
+//        if (mCliente.name?.length ?: 0 <= 15) {
+//            showToast("Nome deve ter mais de 15 caracteres.")
+//            return false
+//        }
+//        val values = ContentValues()
+//        values.put("clienteNome", mCliente.name)
+//
+//        return try {
+//            sqlWrite.insert(SQLite.TABELA_CLIENTE, null, values)
+//            Log.i("Cliente Dados", "${SQLite.TABELA_CLIENTE} $values")
+//            true
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            false
+//        }
+//    }
 
     @SuppressLint("Range")
     fun listClientes(): List<ClienteEntity> {
@@ -50,33 +105,33 @@ class Dao(context: Context) : Interface {
             val cliente = ClienteEntity()
             val codigo = cursor.getLong(cursor.getColumnIndexOrThrow("cliCodigo"))
             var nome: String?
-//            var userName: String?
-//            var password: String?
-//            var adress: String?
-//            var email: String?
-//            var date: String
-//            var cpfOrCnpj: String?
-//            var gender: String?
-//            var picture: String?
+            var userName: String?
+            var password: String?
+            var adress: String?
+            var email: String?
+            var date: String
+            var cpfOrCnpj: String?
+            var gender: String?
+            var picture: String?
             nome = cursor.getString(cursor.getColumnIndex("clienteNome"))
-//            userName = cursor.getString(cursor.getColumnIndex("clienteUserName"))
-//            password = cursor.getString(cursor.getColumnIndex("password"))
-//            adress = cursor.getString(cursor.getColumnIndex("adress"))
-//            email = cursor.getString(cursor.getColumnIndex("email"))
-//            date = cursor.getLong(cursor.getColumnIndex("date")).toString()
-//            cpfOrCnpj = cursor.getString(cursor.getColumnIndex("cpfOrCnpj"))
-//            gender = cursor.getString(cursor.getColumnIndex("gender"))
-//            picture = cursor.getString(cursor.getColumnIndex("picture"))
+            userName = cursor.getString(cursor.getColumnIndex("clienteUserName"))
+            password = cursor.getString(cursor.getColumnIndex("password"))
+            adress = cursor.getString(cursor.getColumnIndex("adress"))
+            email = cursor.getString(cursor.getColumnIndex("email"))
+            date = cursor.getLong(cursor.getColumnIndex("date")).toString()
+            cpfOrCnpj = cursor.getString(cursor.getColumnIndex("cpfOrCnpj"))
+            gender = cursor.getString(cursor.getColumnIndex("gender"))
+            picture = cursor.getString(cursor.getColumnIndex("picture"))
             cliente.codeId = codigo
             cliente.name = nome
-//            cliente.userName = userName
-//            cliente.password = password
-//            cliente.adress = adress
-//            cliente.email = email
-//            cliente.date = date.toLong()
-//            cliente.cpfOrCnpj = cpfOrCnpj
-//            cliente.gender = gender
-//            cliente.picture = picture
+            cliente.userName = userName
+            cliente.password = password
+            cliente.adress = adress
+            cliente.email = email
+            cliente.date = date.toLong()
+            cliente.cpfOrCnpj = cpfOrCnpj
+            cliente.gender = gender
+            cliente.picture = picture
             listClientes.add(cliente)
         }
         return listClientes
@@ -92,39 +147,40 @@ class Dao(context: Context) : Interface {
             cliente = ClienteEntity()
             cliente.codeId = cursor.getLong(cursor.getColumnIndexOrThrow("cliCodigo"))
             cliente.name = cursor.getString(cursor.getColumnIndex("clienteNome"))
-//            cliente.userName = cursor.getString(cursor.getColumnIndex("clienteUserName"))
-//            cliente.password = cursor.getString(cursor.getColumnIndex("password"))
-//            cliente.adress = cursor.getString(cursor.getColumnIndex("adress"))
-//            cliente.email = cursor.getString(cursor.getColumnIndex("email"))
-//            cliente.date = cursor.getLong(cursor.getColumnIndex("date"))
-//            cliente.cpfOrCnpj = cursor.getString(cursor.getColumnIndex("cpfOrCnpj"))
-//            cliente.picture = cursor.getString(cursor.getColumnIndex("picture"))
+            cliente.userName = cursor.getString(cursor.getColumnIndex("clienteUserName"))
+            cliente.password = cursor.getString(cursor.getColumnIndex("password"))
+            cliente.adress = cursor.getString(cursor.getColumnIndex("adress"))
+            cliente.email = cursor.getString(cursor.getColumnIndex("email"))
+            cliente.date = cursor.getLong(cursor.getColumnIndex("date"))
+            cliente.cpfOrCnpj = cursor.getString(cursor.getColumnIndex("cpfOrCnpj"))
+            cliente.picture = cursor.getString(cursor.getColumnIndex("picture"))
             cursor.close()
         }
         return cliente
     }
 
     //metodo para checkar o userName existente
-//    private fun checkIfUsernameExists(username: String): Boolean {
-//        val sqlSelect = "select * from " + SQLite.TABELA_CLIENTE + " where clienteUserName = ?"
-//        val cursor = sqlRead.rawQuery(sqlSelect, arrayOf(username))
-//        val usernameExists = cursor.count > 0
-//        cursor.close()
-//        return usernameExists
-//    }
-//
-//    //metodo para validar senha
-//    fun isPasswordValid(password: String): Boolean {
-//        return password.length >= 8 && password.matches(".*\\d.*") && password.matches(".*[A-Z].*")
-//    }
-//
-//    //metodo para validar email
-//    private fun isValidEmail(email: String): Boolean {
-//        val emailRegex =
-//            "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$"
-//        val pattern = Pattern.compile(emailRegex)
-//        return pattern.matcher(email).matches()
-//    }
+    private fun checkIfUsernameExists(username: String): Boolean {
+        val sqlSelect = "select * from " + SQLite.TABELA_CLIENTE + " where clienteUserName = ?"
+        val cursor = sqlRead.rawQuery(sqlSelect, arrayOf(username))
+        val usernameExists = cursor.count > 0
+        cursor.close()
+        return usernameExists
+    }
+
+    //metodo para validar senha
+    fun isPasswordValid(password: String): Boolean {
+        val passwordRegex = "^(?=.*[A-Z])(?=.*\\d).{8,}\$"
+        val pattern = Regex(passwordRegex)
+        return pattern.matches(password)
+    }
+
+    //metodo para validar email
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$"
+        val pattern = Pattern.compile(emailRegex)
+        return pattern.matcher(email).matches()
+    }
 
     private fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
