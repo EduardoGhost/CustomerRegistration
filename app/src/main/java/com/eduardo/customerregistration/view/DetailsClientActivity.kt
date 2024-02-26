@@ -14,6 +14,8 @@ import androidx.core.app.ActivityCompat
 import com.eduardo.customerregistration.R
 import com.eduardo.customerregistration.model.ClienteEntity
 import com.eduardo.customerregistration.model.dataBase.local.remote.Dao
+import com.eduardo.customerregistration.utils.DateUtils
+import com.eduardo.customerregistration.utils.MaskUtils
 import com.eduardo.customerregistration.viewModel.DetailViewModel
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -34,13 +36,13 @@ class DetailsClientActivity : AppCompatActivity() {
 
     fun initViews() {
         textNome = findViewById(R.id.txtNome)
-//        textUserName = findViewById(R.id.txtUserName)
-//        textAdress = findViewById(R.id.txtAdress)
-//        textEmail = findViewById(R.id.txtEmail)
-//        textDate = findViewById(R.id.txtDate)
-//        textCpfOrCnpj = findViewById(R.id.txtCpfOrCnpj)
-//        textGender = findViewById(R.id.txtGender)
-//        imageViewPhoto = findViewById(R.id.imageViewDetails)
+        textUserName = findViewById(R.id.txtUserName)
+        textAdress = findViewById(R.id.txtAdress)
+        textEmail = findViewById(R.id.txtEmail)
+        textDate = findViewById(R.id.txtDate)
+        textCpfOrCnpj = findViewById(R.id.txtCpfOrCnpj)
+        textGender = findViewById(R.id.txtGender)
+        imageViewPhoto = findViewById(R.id.imageViewDetails)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,74 +83,74 @@ class DetailsClientActivity : AppCompatActivity() {
     // Interface com os detalhes
     private fun updateUIWithDetails(detalhes: ClienteEntity) {
         textNome!!.text = detalhes.name
-//        textUserName!!.text = detalhes.userName
-//        textAdress!!.text = detalhes.adress
-//        textEmail!!.text = detalhes.email
-//        val timestamp = detalhes.date
-//        val formattedDate = DateUtils.formatDateFromTimestamp(timestamp)
-//        textDate!!.text = formattedDate
-//        val cpfOrCnpj = detalhes.cpfOrCnpj
-//        if (MaskUtils.isCpf(cpfOrCnpj)) {
-//            textCpfOrCnpj!!.text = MaskUtils.formatCpf(cpfOrCnpj)
-//        } else {
-//            textCpfOrCnpj!!.text = MaskUtils.formatCnpj(cpfOrCnpj)
-//        }
-//        textGender!!.text = detalhes.gender
+        textUserName!!.text = detalhes.userName
+        textAdress!!.text = detalhes.adress
+        textEmail!!.text = detalhes.email
+        val timestamp = detalhes.date
+        val formattedDate = DateUtils.formatDateFromTimestamp(timestamp!!)
+        textDate!!.text = formattedDate
+        val cpfOrCnpj = detalhes.cpfOrCnpj
+        if (MaskUtils.isCpf(cpfOrCnpj)) {
+            textCpfOrCnpj!!.text = MaskUtils.formatCpf(cpfOrCnpj!!)
+        } else {
+            textCpfOrCnpj!!.text = MaskUtils.formatCnpj(cpfOrCnpj!!)
+        }
+        textGender!!.text = detalhes.gender
 
-        // Verifica se a permissão de leitura externa não foi concedida
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-//            != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            ActivityCompat.requestPermissions(
-//                this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-//                REQUEST_STORAGE_PERMISSION
-//            )
-//        } else {
-//            loadImageView(detalhes)
-//        }
+     //    Verifica se a permissão de leitura externa não foi concedida
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                REQUEST_STORAGE_PERMISSION
+            )
+        } else {
+            loadImageView(detalhes)
+        }
     }
 
-//    private fun loadImageView(detalhes: ClienteEntity) {
-//        // Verificar se a permissão já foi concedida
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.READ_EXTERNAL_STORAGE
-//            ) == PackageManager.PERMISSION_GRANTED
-//        ) {
-//            val imagePath = detalhes.picture
-//            if (imagePath != null && !imagePath.isEmpty()) {
-//                // Use Picasso para carregar a imagem
-//                Picasso.get().load(File(imagePath)).into(imageViewPhoto, object : Callback {
-//                    override fun onSuccess() {}
-//                    override fun onError(e: Exception) {
-//                        Toast.makeText(
-//                            this@DetailsClientActivity,
-//                            "Erro ao carregar a imagem",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                        Log.e("Picasso", "erro", e)
-//                        e.printStackTrace()
-//                    }
-//                })
-//            } else {
-//                Toast.makeText(
-//                    this@DetailsClientActivity,
-//                    "Sem imagem disponível",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//            }
-//        } else {
-//            // Permissão não concedida, solicite permissão
-//            ActivityCompat.requestPermissions(
-//                this,
-//                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-//                REQUEST_READ_EXTERNAL_STORAGE
-//            )
-//        }
-//    }
-//
-//    companion object {
-//        private const val REQUEST_STORAGE_PERMISSION = 1
-//        private const val REQUEST_READ_EXTERNAL_STORAGE = 1
-//    }
+    private fun loadImageView(detalhes: ClienteEntity) {
+        // Verificar se a permissão já foi concedida
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val imagePath = detalhes.picture
+            if (imagePath != null && !imagePath.isEmpty()) {
+                // Use Picasso para carregar a imagem
+                Picasso.get().load(File(imagePath)).into(imageViewPhoto, object : Callback {
+                    override fun onSuccess() {}
+                    override fun onError(e: Exception) {
+                        Toast.makeText(
+                            this@DetailsClientActivity,
+                            "Erro ao carregar a imagem",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.e("Picasso", "erro", e)
+                        e.printStackTrace()
+                    }
+                })
+            } else {
+                Toast.makeText(
+                    this@DetailsClientActivity,
+                    "Sem imagem disponível",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else {
+            // Permissão não concedida, solicite permissão
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                REQUEST_READ_EXTERNAL_STORAGE
+            )
+        }
+    }
+
+    companion object {
+        private const val REQUEST_STORAGE_PERMISSION = 1
+        private const val REQUEST_READ_EXTERNAL_STORAGE = 1
+    }
 }

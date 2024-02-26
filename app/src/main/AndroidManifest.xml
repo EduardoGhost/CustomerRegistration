@@ -20,7 +20,7 @@
         <activity
             android:name="com.eduardo.customerregistration.view.listClientActivity"
             android:exported="false"
-            android:label="clients_list"
+            android:label="@string/clients_list"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.app.lib_name"
@@ -44,18 +44,18 @@
         </activity>
         <activity
             android:name="com.eduardo.customerregistration.view.CadastroActivity"
-            android:exported="false"
-            android:label="activity_cadastro"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.CustomerRegistration.NoActionBar">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
+            android:exported="true"
+            android:label="@string/title_activity_cadastro"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name="com.eduardo.customerregistration.view.EditClientActivity"
+            android:label="@string/editClient"
+            android:parentActivityName=".view.listClientActivity" />
 
         <activity
             android:name="com.eduardo.customerregistration.view.DetailsClientActivity"
-            android:label="detailsClient"
+            android:label="@string/detailsClient"
             android:parentActivityName=".view.listClientActivity" />
 
     </application>

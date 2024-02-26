@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.customerregistration.R
 import com.eduardo.customerregistration.model.ClienteEntity
 import com.eduardo.customerregistration.model.dataBase.local.remote.Dao
-import java.util.ArrayList
 
 class listClientActivity : AppCompatActivity() {
     private var listClientes: List<ClienteEntity> = ArrayList()
     private var recyclerViewClientes: RecyclerView? = null
     private var adapter: Adapter? = null
+
     fun initViews() {
         recyclerViewClientes = findViewById<View>(R.id.idRecyclerViewListedClients) as RecyclerView
     }
@@ -23,7 +23,7 @@ class listClientActivity : AppCompatActivity() {
     fun loadListclients() {
         val daoCliente = Dao(baseContext)
         listClientes = daoCliente.listClientes()
-        adapter = Adapter(listClientes)
+        adapter = Adapter(listClientes as MutableList<ClienteEntity>, applicationContext)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(applicationContext)
         recyclerViewClientes!!.layoutManager = layoutManager
         recyclerViewClientes!!.setHasFixedSize(true)

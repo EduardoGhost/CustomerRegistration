@@ -48,9 +48,10 @@ class CadastroActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cadastro)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         initializeComponents()
 
-        cadastroViewModel = ViewModelProvider(this).get(CadastroViewModel::class.java)
+        cadastroViewModel = ViewModelProvider(this)[CadastroViewModel::class.java]
 
         cadastroViewModel.cadastroResult.observe(this) { resultado ->
             if (resultado) {
@@ -100,23 +101,16 @@ class CadastroActivity : AppCompatActivity() {
             selectedImageUri = data.data!!
             val imagePath = getRealPathFromUri(selectedImageUri)
 
-            if (imagePath != null) {
-                val selectedBitmap = BitmapFactory.decodeFile(imagePath)
-                imageViewPhoto.setImageBitmap(selectedBitmap)
-            } else {
-                Toast.makeText(this, "Falha ao obter caminho do arquivo da imagem", Toast.LENGTH_SHORT).show()
-            }
+            val selectedBitmap = BitmapFactory.decodeFile(imagePath)
+            imageViewPhoto.setImageBitmap(selectedBitmap)
             Picasso.get().load(File(imagePath)).into(imageViewPhoto)
         }
     }
 
     private fun getRealPathFromUri(contentUri: Uri): String {
         val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor: Cursor? = contentResolver.query(contentUri, projection, null, null, null)
-
-        if (cursor == null) {
-            return contentUri.path!!
-        }
+        val cursor: Cursor = contentResolver.query(contentUri, projection, null, null, null)
+            ?: return contentUri.path!!
 
         val column_index: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
         cursor.moveToFirst()
@@ -144,7 +138,7 @@ class CadastroActivity : AppCompatActivity() {
         radioGroup.clearCheck()
 
         // Configurar o ouvinte de alteração no RadioGroup
-        radioGroup.setOnCheckedChangeListener { group, checkedId ->
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
             if (checkedId == R.id.radioCPF) {
                 // CPF foi selecionado
                 editTextCpfOrCnpj.hint = "CPF"
@@ -168,7 +162,7 @@ class CadastroActivity : AppCompatActivity() {
         val setCliente = ClienteEntity()
 
       //   Obtém o CPF digitado e aplica a desmascaração
-        val cpfOrCnpj = editTextCpfOrCnpj!!.text.toString()
+        val cpfOrCnpj = editTextCpfOrCnpj.text.toString()
         val cpfUnmasked = unmask(cpfOrCnpj)
         setCliente.name = getText(editTextName)
         setCliente.userName = getText(editTextUserName)
@@ -183,7 +177,7 @@ class CadastroActivity : AppCompatActivity() {
         setCliente.picture = imagePath
 
         // Chama o método da ViewModel para cadastrar o cliente
-        cadastroViewModel!!.cadastrarCliente(dao, setCliente)
+        cadastroViewModel.cadastrarCliente(dao, setCliente)
         Log.i(" Nome: ", setCliente.name!!)
         val formattedDate = DateUtils.formatDateFromTimestamp(setCliente.date!!)
         Log.i(
@@ -203,20 +197,20 @@ class CadastroActivity : AppCompatActivity() {
     }
 
     fun clearFields() {
-        editTextName!!.setText("")
-        editTextUserName!!.setText("")
-        editTextPassword!!.setText("")
-        editAdress!!.setText("")
-        editTextEmail!!.setText("")
-        editTextDate!!.setText("")
-        editTextCpfOrCnpj!!.setText("")
-        imageViewPhoto!!.setImageBitmap(null)
+        editTextName.setText("")
+        editTextUserName.setText("")
+        editTextPassword.setText("")
+        editAdress.setText("")
+        editTextEmail.setText("")
+        editTextDate.setText("")
+        editTextCpfOrCnpj.setText("")
+        imageViewPhoto.setImageBitmap(null)
     }
 
     // Método para definir a máscara do CPF
     private fun setMaskCpf() {
         val formatter = MaskedFormatter("###.###.###-##")
-        editTextCpfOrCnpj!!.addTextChangedListener(MaskedWatcher(formatter, editTextCpfOrCnpj!!))
+        editTextCpfOrCnpj.addTextChangedListener(MaskedWatcher(formatter, editTextCpfOrCnpj!!))
     }
 
     // Método para remover a máscara do CPF (retorna apenas os números)
@@ -227,7 +221,7 @@ class CadastroActivity : AppCompatActivity() {
     // Método para definir a máscara do CNPJ
     private fun setMaskCnpj() {
         val formatter = MaskedFormatter("##.###.###/####-##")
-        editTextCpfOrCnpj!!.addTextChangedListener(MaskedWatcher(formatter, editTextCpfOrCnpj!!))
+        editTextCpfOrCnpj.addTextChangedListener(MaskedWatcher(formatter, editTextCpfOrCnpj))
     }
 
     private val genderSelect: String

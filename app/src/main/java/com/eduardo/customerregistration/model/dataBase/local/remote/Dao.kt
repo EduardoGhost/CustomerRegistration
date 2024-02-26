@@ -77,24 +77,63 @@ class Dao(context: Context) : Interface {
         }
     }
 
-//    override fun cadastroCliente(mCliente: ClienteEntity): Boolean {
-//        // Verifica se o nome tem mais de 15 caracteres
-//        if (mCliente.name?.length ?: 0 <= 15) {
-//            showToast("Nome deve ter mais de 15 caracteres.")
-//            return false
-//        }
-//        val values = ContentValues()
-//        values.put("clienteNome", mCliente.name)
-//
-//        return try {
-//            sqlWrite.insert(SQLite.TABELA_CLIENTE, null, values)
-//            Log.i("Cliente Dados", "${SQLite.TABELA_CLIENTE} $values")
-//            true
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            false
-//        }
-//    }
+    override fun alterarCliente(mCliente: ClienteEntity): Boolean {
+        val senha = mCliente.password
+
+        //validador de email
+        return if (isValidEmail(mCliente.email!!)) {
+
+            //verifica se o nome tem mais de 15 caracteres
+            if (mCliente.name?.length ?: 0 <= 15) {
+                showToast("Nome deve ter mais de 15 caracteres.")
+                return false
+            }
+            //verifica se é maior do que 18 anos
+            val idade = mCliente.calculateAge()
+            if (idade < 18) {
+                showToast("É necessário ter mais de 18 anos para se cadastrar.")
+                return false
+            }
+            if (isPasswordValid(senha!!)) {
+                val values = ContentValues()
+                values.put("clienteNome", mCliente.name)
+                values.put("clienteUserName", mCliente.userName)
+                values.put("password", mCliente.password)
+                values.put("adress", mCliente.adress)
+                values.put("email", mCliente.email)
+                values.put("date", mCliente.date)
+                values.put("cpfOrCnpj", mCliente.cpfOrCnpj)
+                //    values.put("gender", mCliente.getGender());
+                //  values.put("picture", mCliente.getPicture());
+                try {
+                    val id = arrayOf(mCliente.codeId.toString())
+                    sqlWrite.update(SQLite.TABELA_CLIENTE, values, "cliCodigo = ?", id)
+                    sqlWrite.close()
+                    true
+                } catch (e: Exception) {
+                    Log.i("Informação: ", "Erro ao atualizar dados: " + e.message)
+                    false
+                }
+            } else {
+                showToast("Senha inválida. Deve ter pelo menos 8 caracteres, um número e uma letra maiúscula.")
+                false
+            }
+        } else {
+            showToast("Email inválido. Insira um email válido.")
+            false
+        }
+    }
+
+    override fun deleteCliente(mCliente: ClienteEntity): Boolean {
+        return try {
+            val id = arrayOf(mCliente.codeId.toString())
+            sqlWrite.delete(SQLite.TABELA_CLIENTE, "cliCodigo = ?", id)
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
 
     @SuppressLint("Range")
     fun listClientes(): List<ClienteEntity> {
