@@ -2,14 +2,20 @@ package com.eduardo.customerregistration.model.dataBase.local.remote
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.util.Log
 import android.widget.Toast
 import com.eduardo.customerregistration.model.ClienteEntity
 import com.eduardo.customerregistration.model.dataBase.local.Interface
 import java.lang.Exception
 import java.util.regex.Pattern
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class Dao(context: Context) : Interface {
     //escrever e ler os dados
@@ -27,53 +33,53 @@ class Dao(context: Context) : Interface {
     override fun cadastroCliente(mCliente: ClienteEntity): Boolean {
         val senha = mCliente.password
 
-        //validador de email
-        return if (isValidEmail(mCliente.email!!)) {
-
-            //verifica se o nome tem mais de 15 caracteres
-            if (mCliente.name?.length ?: 0 <= 15) {
-                showToast("Nome deve ter mais de 15 caracteres.")
-                return false
-            }
-
-            //vertifica se userName já existe
-            if (checkIfUsernameExists(mCliente.userName!!)) {
-                showToast("Username já está em uso. Escolha outro.")
-                return false
-            }
-
-            //verifica se é maior do que 18 anos
-            val idade = mCliente.calculateAge()
-            if (idade < 18) {
-                showToast("É necessário ter mais de 18 anos para se cadastrar.")
-                return false
-            }
-            if (isPasswordValid(senha!!)) {
-                val values = ContentValues()
-                values.put("clienteNome", mCliente.name)
-                values.put("clienteUserName", mCliente.userName)
-                values.put("password", senha)
-                values.put("adress", mCliente.adress)
-                values.put("email", mCliente.email)
-                values.put("date", mCliente.date)
-                values.put("cpfOrCnpj", mCliente.cpfOrCnpj)
-                values.put("gender", mCliente.gender)
-                values.put("picture", mCliente.picture)
-                try {
+        return if (!isValidEmail(mCliente.email!!)) {
+            showToast("Email inválido. Insira um email válido.")
+            false
+        } else if (mCliente.name?.length ?: 0 <= 15) {
+            showToast("Nome deve ter mais de 15 caracteres.")
+            false
+        } else if (checkIfUsernameExists(mCliente.userName!!)) {
+            showToast("Username já está em uso. Escolha outro.")
+            false
+        } else if (mCliente.calculateAge() < 18) {
+            showToast("É necessário ter mais de 18 anos para se cadastrar.")
+            false
+        } else if (!isPasswordValid(senha!!)) {
+            showToast("Senha inválida. Deve ter pelo menos 8 caracteres, um número e uma letra maiúscula.")
+            false
+        } else {
+            GlobalScope.launch(Dispatchers.IO) {
+                val success = try {
+                    val values = ContentValues().apply {
+                        put("clienteNome", mCliente.name)
+                        put("clienteUserName", mCliente.userName)
+                        put("password", senha)
+                        put("adress", mCliente.adress)
+                        put("email", mCliente.email)
+                        put("date", mCliente.date)
+                        put("cpfOrCnpj", mCliente.cpfOrCnpj)
+                        put("gender", mCliente.gender)
+                        put("picture", mCliente.picture)
+                    }
                     sqlWrite.insert(SQLite.TABELA_CLIENTE, null, values)
                     Log.i("Cliente Dados", SQLite.TABELA_CLIENTE + values)
                     true
-                } catch (e: Exception) {
+                } catch (e: SQLiteException) {
                     e.printStackTrace()
                     false
                 }
-            } else {
-                showToast("Senha inválida. Deve ter pelo menos 8 caracteres, um número e uma letra maiúscula.")
-                false
+                withContext(Dispatchers.Main) {
+                    if (success) {
+                        Log.d(TAG, "Cadastro realizado com sucesso!")
+
+                    } else {
+                        Log.e(TAG, "Erro ao realizar o cadastro!")
+
+                    }
+                }
             }
-        } else {
-            showToast("Email inválido. Insira um email válido.")
-            false
+            true
         }
     }
 

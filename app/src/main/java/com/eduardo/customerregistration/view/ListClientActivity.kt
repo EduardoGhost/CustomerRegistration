@@ -10,6 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.eduardo.customerregistration.R
 import com.eduardo.customerregistration.model.ClienteEntity
 import com.eduardo.customerregistration.model.dataBase.local.remote.Dao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class listClientActivity : AppCompatActivity() {
     private var listClientes: List<ClienteEntity> = ArrayList()
@@ -20,21 +24,32 @@ class listClientActivity : AppCompatActivity() {
         recyclerViewClientes = findViewById<View>(R.id.idRecyclerViewListedClients) as RecyclerView
     }
 
-    fun loadListclients() {
+    fun loadListClients() {
         val daoCliente = Dao(baseContext)
-        listClientes = daoCliente.listClientes()
-        adapter = Adapter(listClientes as MutableList<ClienteEntity>, applicationContext)
-        val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(applicationContext)
-        recyclerViewClientes!!.layoutManager = layoutManager
-        recyclerViewClientes!!.setHasFixedSize(true)
-        recyclerViewClientes!!.addItemDecoration(
-            DividerItemDecoration(
-                applicationContext,
-                LinearLayout.VERTICAL
-            )
-        )
-        recyclerViewClientes!!.adapter = adapter
+        val activity = this@listClientActivity // Referência à atividade atual
+
+        CoroutineScope(Dispatchers.Main).launch {
+            // Carrega a lista de clientes de forma assíncrona
+            listClientes = withContext(Dispatchers.IO) {
+                daoCliente.listClientes()
+            }
+            // Atualiza o RecyclerView com a lista de clientes carregada
+            adapter = Adapter(listClientes as MutableList<ClienteEntity>, applicationContext)
+            activity.recyclerViewClientes?.apply {
+                layoutManager = LinearLayoutManager(applicationContext)
+                setHasFixedSize(true)
+                addItemDecoration(
+                    DividerItemDecoration(
+                        applicationContext,
+                        LinearLayout.VERTICAL
+                    )
+                )
+                adapter = activity.adapter
+            }
+
+        }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +59,7 @@ class listClientActivity : AppCompatActivity() {
     }
 
     override fun onStart() {
-        loadListclients()
+        loadListClients()
         super.onStart()
     }
 }

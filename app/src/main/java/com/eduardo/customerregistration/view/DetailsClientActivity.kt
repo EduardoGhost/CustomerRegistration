@@ -17,8 +17,11 @@ import com.eduardo.customerregistration.model.dataBase.local.remote.Dao
 import com.eduardo.customerregistration.utils.DateUtils
 import com.eduardo.customerregistration.utils.MaskUtils
 import com.eduardo.customerregistration.viewModel.DetailViewModel
-import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.Exception
 
@@ -119,10 +122,14 @@ class DetailsClientActivity : AppCompatActivity() {
         ) {
             val imagePath = detalhes.picture
             if (imagePath != null && !imagePath.isEmpty()) {
-                // Use Picasso para carregar a imagem
-                Picasso.get().load(File(imagePath)).into(imageViewPhoto, object : Callback {
-                    override fun onSuccess() {}
-                    override fun onError(e: Exception) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    try {
+                        val bitmap = withContext(Dispatchers.IO) {
+                            // Carregar a imagem de forma assíncrona
+                            Picasso.get().load(File(imagePath)).get()
+                        }
+                        imageViewPhoto?.setImageBitmap(bitmap)
+                    } catch (e: Exception) {
                         Toast.makeText(
                             this@DetailsClientActivity,
                             "Erro ao carregar a imagem",
@@ -131,7 +138,7 @@ class DetailsClientActivity : AppCompatActivity() {
                         Log.e("Picasso", "erro", e)
                         e.printStackTrace()
                     }
-                })
+                }
             } else {
                 Toast.makeText(
                     this@DetailsClientActivity,
@@ -140,7 +147,7 @@ class DetailsClientActivity : AppCompatActivity() {
                 ).show()
             }
         } else {
-            // Permissão não concedida, solicite permissão
+            // Permissão não concedida, solicite permissão novamente
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
