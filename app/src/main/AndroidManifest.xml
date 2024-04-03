@@ -26,7 +26,6 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -52,12 +51,16 @@
             android:name="com.eduardo.customerregistration.view.EditClientActivity"
             android:label="@string/editClient"
             android:parentActivityName=".view.listClientActivity" />
-
         <activity
             android:name="com.eduardo.customerregistration.view.DetailsClientActivity"
             android:label="@string/detailsClient"
             android:parentActivityName=".view.listClientActivity" />
 
+        <activity
+            android:name="com.eduardo.customerregistration.view.LoginActivity"
+            android:exported="true"
+            android:label="@string/title_activity_login"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

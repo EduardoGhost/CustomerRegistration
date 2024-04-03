@@ -4,6 +4,7 @@
     <string name="clients_list">Lista de Clientes</string>
     <string name="detailsClient">Detalhes do Cliente</string>
     <string name="editClient">Edição do Cliente</string>
+    <string name="title_activity_login">Login</string>
 
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->

@@ -1,6 +1,7 @@
 package com.eduardo.customerregistration
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ import androidx.core.app.ActivityCompat
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import com.eduardo.customerregistration.databinding.ActivityMainBinding
+import com.eduardo.customerregistration.view.LoginActivity
 
 class MainActivity : AppCompatActivity() {
     private var appBarConfiguration: AppBarConfiguration? = null
@@ -70,10 +72,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        return if (id == R.id.action_settings) {
-            true
-        } else super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.login -> {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
